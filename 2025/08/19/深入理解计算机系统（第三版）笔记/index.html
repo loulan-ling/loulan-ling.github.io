@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="第1章 计算机系统漫游GitHub笔记地址：https:&#x2F;&#x2F;github.com&#x2F;loulan-ling&#x2F;CSAPP3e-Notes 1.1 程序编译流程编译命令 1234gcc -E hello.c -o hello.igcc -S hello.i -o hello.sgcc -c hello.s -o hello.ogcc -o hello hello.o -Wl -t  1、源程序文本hel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解计算机系统（第三版）笔记">
+<meta property="og:url" content="http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="ling">
+<meta property="og:description" content="第1章 计算机系统漫游GitHub笔记地址：https:&#x2F;&#x2F;github.com&#x2F;loulan-ling&#x2F;CSAPP3e-Notes 1.1 程序编译流程编译命令 1234gcc -E hello.c -o hello.igcc -S hello.i -o hello.sgcc -c hello.s -o hello.ogcc -o hello hello.o -Wl -t  1、源程序文本hel">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250720230509.png">
+<meta property="og:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%A1%AC%E4%BB%B6%E7%BB%84%E6%88%90.png">
+<meta property="og:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/image-20250819181441239.png">
+<meta property="og:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250723175449.png">
+<meta property="og:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250724175948.png">
+<meta property="og:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250725180245.png">
+<meta property="article:published_time" content="2025-08-19T12:25:51.000Z">
+<meta property="article:modified_time" content="2025-08-19T12:31:03.268Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250720230509.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>深入理解计算机系统（第三版）笔记</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a href="/projects_url">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2024/09/10/openwrt%E7%BD%91%E7%BB%9C%E6%90%AD%E5%BB%BA/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&text=深入理解计算机系统（第三版）笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&is_video=false&description=深入理解计算机系统（第三版）笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=深入理解计算机系统（第三版）笔记&body=Check out this article: http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&name=深入理解计算机系统（第三版）笔记&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&t=深入理解计算机系统（第三版）笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC1%E7%AB%A0-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8"><span class="toc-number">1.</span> <span class="toc-text">第1章 计算机系统漫游</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 程序编译流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E5%8F%AF%E9%87%8D%E5%AE%9A%E4%BD%8D%E7%9B%AE%E6%A0%87%E7%A8%8B%E5%BA%8F%EF%BC%88relocatable-object-program%EF%BC%89%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 可重定位目标程序（relocatable object program）格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E5%A4%84%E7%90%86%E5%99%A8%E8%AF%BB%E5%B9%B6%E8%A7%A3%E9%87%8A%E5%82%A8%E5%AD%98%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">1.3.</span> <span class="toc-text">1.4 处理器读并解释储存在内存中的指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-1-%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%A1%AC%E4%BB%B6%E7%BB%84%E6%88%90"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.4.1 系统的硬件组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-1-%E6%80%BB%E7%BA%BF"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">1.4.1.1 总线</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-2-I-O%E8%AE%BE%E5%A4%87"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">1.4.1.2 I&#x2F;O设备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-3-%E4%B8%BB%E5%AD%98%EF%BC%88%E5%86%85%E5%AD%98%E6%9D%A1%EF%BC%89"><span class="toc-number">1.3.1.3.</span> <span class="toc-text">1.4.1.3 主存（内存条）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-4-%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%88CPU%EF%BC%89"><span class="toc-number">1.3.1.4.</span> <span class="toc-text">1.4.1.4 处理器（CPU）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-2-%E8%BF%90%E8%A1%8Chello%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.3.2.</span> <span class="toc-text">1.4.2 运行hello程序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%8F%AA%E5%85%B3%E9%87%8D%E8%A6%81"><span class="toc-number">1.4.</span> <span class="toc-text">1.5 高速缓存只关重要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%E5%BD%A2%E6%88%90%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="toc-number">1.5.</span> <span class="toc-text">1.6 存储设备形成层次结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-7-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86%E7%A1%AC%E4%BB%B6"><span class="toc-number">1.6.</span> <span class="toc-text">1.7 操作系统管理硬件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-1-%E8%BF%9B%E7%A8%8B"><span class="toc-number">1.6.1.</span> <span class="toc-text">1.7.1 进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-2-%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.6.2.</span> <span class="toc-text">1.7.2 线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-3-%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="toc-number">1.6.3.</span> <span class="toc-text">1.7.3 虚拟内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-4-%E6%96%87%E4%BB%B6"><span class="toc-number">1.6.4.</span> <span class="toc-text">1.7.4 文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-8-%E7%B3%BB%E7%BB%9F%E4%B9%8B%E9%97%B4%E5%88%A9%E7%94%A8%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1"><span class="toc-number">1.7.</span> <span class="toc-text">1.8 系统之间利用网络通信</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-9-%E9%87%8D%E8%A6%81%E4%B8%BB%E9%A2%98"><span class="toc-number">1.8.</span> <span class="toc-text">1.9 重要主题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-1-Amdahl%E5%AE%9A%E7%90%86"><span class="toc-number">1.8.1.</span> <span class="toc-text">1.9.1 Amdahl定理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-2-%E5%B9%B6%E5%8F%91%E5%92%8C%E5%B9%B6%E8%A1%8C"><span class="toc-number">1.8.2.</span> <span class="toc-text">1.9.2 并发和并行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-3-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E4%B8%AD%E6%8A%BD%E8%B1%A1%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="toc-number">1.8.3.</span> <span class="toc-text">1.9.3 计算机系统中抽象的重要性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-10-%E5%B0%8F%E7%BB%93"><span class="toc-number">1.9.</span> <span class="toc-text">1.10 小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E4%BF%A1%E6%81%AF%E5%AD%98%E5%82%A8"><span class="toc-number">1.10.</span> <span class="toc-text">2.1 信息存储</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%A1%A8%E8%BE%BE%E6%B3%95"><span class="toc-number">1.10.1.</span> <span class="toc-text">2.1.1 十六进制表达法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-1-%E5%AE%8C%E6%88%90%E4%B8%8B%E9%9D%A2%E7%9A%84%E8%BD%AC%E6%8D%A2%EF%BC%9A"><span class="toc-number">1.11.</span> <span class="toc-text">练习题 2.1 完成下面的转换：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-2"><span class="toc-number">1.12.</span> <span class="toc-text">练习题 2.2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-3"><span class="toc-number">1.13.</span> <span class="toc-text">练习题 2.3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-4"><span class="toc-number">1.14.</span> <span class="toc-text">练习题 2.4</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        深入理解计算机系统（第三版）笔记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">John Doe</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-08-19T12:25:51.000Z" itemprop="datePublished">2025-08-19</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id="第1章-计算机系统漫游"><a href="#第1章-计算机系统漫游" class="headerlink" title="第1章 计算机系统漫游"></a>第1章 计算机系统漫游</h1><p>GitHub笔记地址：<a target="_blank" rel="noopener" href="https://github.com/loulan-ling/CSAPP3e-Notes">https://github.com/loulan-ling/CSAPP3e-Notes</a></p>
+<h2 id="1-1-程序编译流程"><a href="#1-1-程序编译流程" class="headerlink" title="1.1 程序编译流程"></a>1.1 程序编译流程</h2><p>编译命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gcc -E hello.c -o hello.i</span><br><span class="line">gcc -S hello.i -o hello.s</span><br><span class="line">gcc -c hello.s -o hello.o</span><br><span class="line">gcc -o hello hello.o -Wl -t</span><br></pre></td></tr></table></figure>
+
+<p>1、源程序文本<br><code>hello.c</code></p>
+<ul>
+<li><ol>
+<li>源代码文本</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">        printf(&quot;hello, world\n&quot;);</span><br><span class="line">        return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过预处理器（cpp）后，会将<code>stdio.h</code>的代码添加到<code>hello.c</code>中，这时候程序后缀是<code>.i</code></p>
+<ul>
+<li><ol start="2">
+<li>编译阶段</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"> &quot;hello.c&quot;</span><br><span class="line"># 1 &quot;&lt;built-in&gt;&quot;</span><br><span class="line"># 1 &quot;&lt;command-line&gt;&quot;</span><br><span class="line"># 31 &quot;&lt;command-line&gt;&quot;</span><br><span class="line"># 1 &quot;/usr/include/stdc-predef.h&quot; 1 3 4</span><br><span class="line"># 32 &quot;&lt;command-line&gt;&quot; 2</span><br><span class="line"># 1 &quot;hello.c&quot;</span><br><span class="line"># 1 &quot;/usr/include/stdio.h&quot; 1 3 4</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line"></span><br><span class="line">extern int ftrylockfile (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__)) ;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">extern void funlockfile (FILE *__stream) __attribute__ ((__nothrow__ , __leaf__));</span><br><span class="line"># 857 &quot;/usr/include/stdio.h&quot; 3 4</span><br><span class="line">extern int __uflow (FILE *);</span><br><span class="line">extern int __overflow (FILE *, int);</span><br><span class="line"># 874 &quot;/usr/include/stdio.h&quot; 3 4</span><br><span class="line"></span><br><span class="line"># 2 &quot;hello.c&quot; 2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 3 &quot;hello.c&quot;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line"> printf(&quot;hello, world\n&quot;);</span><br><span class="line"> return 0;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>预处理结束后到了编译阶段，编译器（ccl）会将修改了的源程序代码编译为汇编语言，<mark style="background: #FF5582A6;">版本不一样的汇编时的代码也不一致</mark></p>
+<ul>
+<li><ol start="3">
+<li>汇编阶段</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">       .file   &quot;hello.c&quot;</span><br><span class="line">        .text</span><br><span class="line">        .section        .rodata</span><br><span class="line">.LC0:</span><br><span class="line">        .string &quot;hello, world&quot;</span><br><span class="line">        .text</span><br><span class="line">        .globl  main</span><br><span class="line">        .type   main, @function</span><br><span class="line">main:</span><br><span class="line">.LFB0:</span><br><span class="line">        .cfi_startproc</span><br><span class="line">        pushq   %rbp</span><br><span class="line">        .cfi_def_cfa_offset 16</span><br><span class="line">        .cfi_offset 6, -16</span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line">        .cfi_def_cfa_register 6</span><br><span class="line">        movl    $.LC0, %edi</span><br><span class="line">        call    puts</span><br><span class="line">        movl    $0, %eax</span><br><span class="line">        popq    %rbp</span><br><span class="line">        .cfi_def_cfa 7, 8</span><br><span class="line">        ret</span><br><span class="line">        .cfi_endproc</span><br><span class="line">.LFE0:</span><br><span class="line">        .size   main, .-main</span><br><span class="line">        .ident  &quot;GCC: (GNU) 10.2.1 20200825 (Alibaba 10.2.1-3.8 2.32)&quot;</span><br><span class="line">        .section        .note.GNU-stack,&quot;&quot;,@progbits</span><br></pre></td></tr></table></figure>
+
+<p>现在到了汇编阶段，汇编器（as）会将<code>hello.s</code>翻译为机器语言</p>
+<ul>
+<li><ol start="4">
+<li>汇编阶段<br>   使用<code>vim</code>查看<code>hello.o</code>只能看到乱码</li>
+</ol>
+</li>
+</ul>
+<p><img src="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250720230509.png"></p>
+<p>使用<code>objdump</code>可以看到十六进制的机器语言</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">hello.o:     file format elf64-x86-64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Disassembly of section .text:</span><br><span class="line"></span><br><span class="line">0000000000000000 &lt;main&gt;:</span><br><span class="line">   0:   55                      push   %rbp</span><br><span class="line">   1:   48 89 e5                mov    %rsp,%rbp</span><br><span class="line">   4:   bf 00 00 00 00          mov    $0x0,%edi</span><br><span class="line">   9:   e8 00 00 00 00          callq  e &lt;main+0xe&gt;</span><br><span class="line">   e:   b8 00 00 00 00          mov    $0x0,%eax</span><br><span class="line">  13:   5d                      pop    </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>5 链接阶段<br>  hello程序调用了<code>printf</code>函数，该函数是每个C编译器都提供的标准C库中的一个函数。<code>printf</code>函数存在一个名为<code>printf.o</code>的单独预编译好了的目的文件中，而这个文件会在链接的过程中合并到我们的<code>hello.o</code>程序中，连接器（ld）就负责处理这种合并。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hello hello.o -Wl,-t</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/../../../../lib64/crt1.o</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/../../../../lib64/crti.o</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/crtbegin.o</span><br><span class="line">hello.o</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/libgcc.a</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/libgcc_s.so</span><br><span class="line">/lib64/libgcc_s.so.1</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/libgcc.a</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/../../../../lib64/libc.so</span><br><span class="line">/lib64/libc.so.6</span><br><span class="line">/usr/lib64/libc_nonshared.a</span><br><span class="line">/lib64/ld-linux-x86-64.so.2</span><br><span class="line">/usr/lib64/libc_nonshared.a</span><br><span class="line">/lib64/ld-linux-x86-64.so.2</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/libgcc.a</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/libgcc_s.so</span><br><span class="line">/lib64/libgcc_s.so.1</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/libgcc.a</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/crtend.o</span><br><span class="line">/usr/lib/gcc/x86_64-redhat-linux/10/../../../../lib64/crtn.o</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2-可重定位目标程序（relocatable-object-program）格式"><a href="#1-2-可重定位目标程序（relocatable-object-program）格式" class="headerlink" title="1.2 可重定位目标程序（relocatable object program）格式"></a>1.2 可重定位目标程序（relocatable object program）格式</h2><p>可重新定位目标程序格式是一种中间代码格式，通常由汇编器（as）生成。这种格式的主要作用是支持程序的动态加载和重定向，从而使得程序能够在不同的内存位置上执行。</p>
+<ol>
+<li><strong>格式结构：</strong><ul>
+<li><strong>机器指令的二进制编码：</strong><ul>
+<li>可重定位目标程序包含了编译后的机器指令，这些指令由汇编器生成，是计算机能够直接执行的代码。</li>
+</ul>
+</li>
+<li><strong>位置信息：</strong><ul>
+<li>此格式还包含重定位信息，用于指示在程序最终链接时需要调整的地址。这些信息用户管理不同模式之间的地址依赖，确保程序在加载时可以正确引用。</li>
+</ul>
+</li>
+<li><strong>符号表：</strong><ul>
+<li>可重定位目标程序通常会包含符号表，列出所有的函数和全局变量符号，以供后续连接器解析。这使得程序在链接阶段能够顺利处理不同模块之间的符号引用。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>生成过程：</strong><ul>
+<li><strong>预处理：</strong> 将源代码进行处理，添加标准库代码，生成预处理文件</li>
+<li><strong>编译：</strong> 将预处理文件翻译位汇编语言</li>
+<li><strong>汇编：</strong> 汇编器将汇编代码转换为机器代码，同时生成可重定位（如hello.o），其中包括机器指令和相关</li>
+</ul>
+</li>
+</ol>
+<h2 id="1-4-处理器读并解释储存在内存中的指令"><a href="#1-4-处理器读并解释储存在内存中的指令" class="headerlink" title="1.4 处理器读并解释储存在内存中的指令"></a>1.4 处理器读并解释储存在内存中的指令</h2><p>  shell是一个命令行解释器，它输出一个提示符，等待输入一个命令行，然后执行这个命令。如果该命令行的第一个单词不是一个内置的shell命令，那么shell会认为这个命令是一个可执行的文件的名字，它将会加载并运行文件。</p>
+<h3 id="1-4-1-系统的硬件组成"><a href="#1-4-1-系统的硬件组成" class="headerlink" title="1.4.1 系统的硬件组成"></a>1.4.1 系统的硬件组成</h3><p><strong>系统硬件组成思维导图</strong></p>
+<p><img src="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%A1%AC%E4%BB%B6%E7%BB%84%E6%88%90.png"></p>
+<h4 id="1-4-1-1-总线"><a href="#1-4-1-1-总线" class="headerlink" title="1.4.1.1 总线"></a>1.4.1.1 总线</h4><p><strong>贯穿整个系统的是一组电子管道，称作总线，它携带信息字节并负责在各个部件间传递。</strong></p>
+<h4 id="1-4-1-2-I-O设备"><a href="#1-4-1-2-I-O设备" class="headerlink" title="1.4.1.2 I/O设备"></a>1.4.1.2 I/O设备</h4><p><strong>I/O（输出/输入）设备是系统与外部世界的联系通道。</strong><br>示例中展示的I/O设备：</p>
+<ul>
+<li>键盘</li>
+<li>鼠标</li>
+<li>显示器</li>
+<li>磁盘</li>
+</ul>
+<h4 id="1-4-1-3-主存（内存条）"><a href="#1-4-1-3-主存（内存条）" class="headerlink" title="1.4.1.3 主存（内存条）"></a>1.4.1.3 主存（内存条）</h4><p>主存是处理器执行程序时用于临时存储程序及其数据的设备。物理上，主存由动态随机存取存储器（DRAM）芯片组成；逻辑上，它是一个线性的字节数组，每个字节都有唯一的地址。<mark style="background: #FF5582A6;">程序指令由不同数量的字节构成，C程序变量的大小取决于其数据类型（例如，在x86-64 Linux系统上，short类型占2字节，int和float字节占4字节，long和double字节占8字节）。</mark><strong>这里只是说明程序指令和C程序变量会根据情况变化</strong></p>
+<h4 id="1-4-1-4-处理器（CPU）"><a href="#1-4-1-4-处理器（CPU）" class="headerlink" title="1.4.1.4 处理器（CPU）"></a>1.4.1.4 处理器（CPU）</h4><p><strong>CPU是计算机系统的核心处理引擎,负责解释和执行存储在主存中的指令</strong><br><strong>CPU主要组成部件</strong></p>
+<ol>
+<li>程序计算器(PC)<ul>
+<li>存储当前执行指令的地址</li>
+<li>决定程序执行的指令流</li>
+</ul>
+</li>
+<li>寄存器文件<ul>
+<li>小型存储设备,由单字长寄存器(寄存器是CPU中用于存储数据和指令的小型存储设备)组成</li>
+<li>每个寄存器都有唯一名称</li>
+<li>可存储临时数据和指针 </li>
+</ul>
+</li>
+<li>算术/逻辑单元(ALU)<ul>
+<li>执行算术和逻辑单元</li>
+<li>计算新的数据和地址值</li>
+</ul>
+</li>
+<li>高速缓存(Cache)<ul>
+<li>多级缓存: L1 L2 L3</li>
+<li>分为指令高速缓存(i-cache)和数据高速缓存(d-cache)</li>
+<li>提高数据访问速度</li>
+</ul>
+</li>
+<li>控制单元(CU)<ul>
+<li>控制指令的解码和执行流程</li>
+<li>协调各个组件的操作</li>
+</ul>
+</li>
+</ol>
+<p><strong>CPU的基本功能</strong></p>
+<ul>
+<li>加载: 从主存复制数据到寄存器</li>
+<li>存储: 从寄存器复制数据到主存</li>
+<li>操作: 执行算术和逻辑运算</li>
+<li>跳转: 更新程序计算器</li>
+</ul>
+<h3 id="1-4-2-运行hello程序"><a href="#1-4-2-运行hello程序" class="headerlink" title="1.4.2 运行hello程序"></a>1.4.2 运行hello程序</h3><p><mark style="background: #FF5582A6;">指令到达寄存器后，CPU就会执行指令。</mark><br><img src="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/image-20250819181441239.png" alt="image-20250819181441239"></p>
+<h2 id="1-5-高速缓存只关重要"><a href="#1-5-高速缓存只关重要" class="headerlink" title="1.5 高速缓存只关重要"></a>1.5 高速缓存只关重要</h2><p>根据上面示例可以看到，运行程序就是将信息从一个地方挪到另一个地方，最后到达处理器。</p>
+<p><strong>信息运行速度表格</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>存储设备类型</strong></th>
+<th align="center"><strong>容量</strong></th>
+<th align="center"><strong>访问时间相对（从处理器访问）</strong></th>
+<th align="center"><strong>备注</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">寄存器文件</td>
+<td align="center">几百字节</td>
+<td align="center">≈主存的1000倍快</td>
+<td align="center">用于存储最常用的数据，速度非常快</td>
+</tr>
+<tr>
+<td align="center">主存（DRAM）</td>
+<td align="center">几十亿字节</td>
+<td align="center">假设1</td>
+<td align="center">容量大，但访问速度相对较慢</td>
+</tr>
+<tr>
+<td align="center">磁盘驱动器</td>
+<td align="center">大约主存的1000倍</td>
+<td align="center">≈ 主存的10000000（1000万倍）</td>
+<td align="center">存储容量极大，但访问速度极慢</td>
+</tr>
+</tbody></table>
+<p>针对处理器和主存之间的差异，系统设计者采用了更小更快的存储设备，成为高速缓存存储器。</p>
+<ul>
+<li>L1高速缓存位于处理器芯片上，容量是数万字节，速度仅比寄存器慢</li>
+<li>L2高速缓存通过一条特殊的总线连接处理器，容量为数十万到数百万字节，速度比L1慢5倍，但是依然比主存快5~10倍</li>
+</ul>
+<h2 id="1-6-存储设备形成层次结构"><a href="#1-6-存储设备形成层次结构" class="headerlink" title="1.6 存储设备形成层次结构"></a>1.6 存储设备形成层次结构</h2><p><mark style="background: #FF5582A6;">看图</mark><br><img src="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250723175449.png"></p>
+<h2 id="1-7-操作系统管理硬件"><a href="#1-7-操作系统管理硬件" class="headerlink" title="1.7 操作系统管理硬件"></a>1.7 操作系统管理硬件</h2><p><mark style="background: #FF5582A6;">操作系统是介于应用程序和硬件之间的软件</mark></p>
+<p>操作系统有两个基本功能：</p>
+<ol>
+<li>防止硬件被失控应用程序滥用</li>
+<li>向应用程序提供简单一致的机制控制不同的硬件设备<br> 操作系统通过几个基本的抽象概念（进程、虚拟内存和文件）来实现这两个功能。</li>
+</ol>
+<p>文件只是对I/O设备的抽象表示<br>虚拟内存是对主存和磁盘I/O设备的抽象表示<br>进程则是对处理器、主存和I/O设备的抽象表示</p>
+<h3 id="1-7-1-进程"><a href="#1-7-1-进程" class="headerlink" title="1.7.1 进程"></a>1.7.1 进程</h3><p>一个处理器可以运行多个进程，每个进程在一个线性上来回运行不同的程序，操作系统内核管理进程时，会为每个进程提供一个假象，就是每个进程都能独自占有整个处理器，处理器也只有占有的那么大。<br>关键点：</p>
+<ul>
+<li><strong>并发执行：</strong> 多个进程可以在同一个系统上并发运行，这意味着一个进程的指令和另一个进程的指令交错执行。</li>
+<li><strong>多任务：</strong> 操作系统使用多任务处理（或时间片）技术，将处理器时间划分时间片，给每个进程安排一个时间片，让进程在时间片内运行（如果时间片时间到了，进程还没结束将会保留上下文切换），通过快速切换进程，操作系统可以实现多进程同时运行的效果。</li>
+<li><strong>上下文切换：</strong> 当操作系统决定切换到另一个进程时，它会保存当前上下文信息（例如， 程序、计数器、寄存器内容），然后恢复上下文。</li>
+</ul>
+<h3 id="1-7-2-线程"><a href="#1-7-2-线程" class="headerlink" title="1.7.2 线程"></a>1.7.2 线程</h3><p>每个线程都运行在进程的上下文中，并共享同样的代码和全局数据。<br>线程切换上下文的速度比进程切换上下文速度快很多，因为线程之间会共享大部分的信息。线程切换上下文只需保存线程独有的信息，例如：栈、寄存器等。<br>多线程一般来说是比多进程更高效。</p>
+<h3 id="1-7-3-虚拟内存"><a href="#1-7-3-虚拟内存" class="headerlink" title="1.7.3 虚拟内存"></a>1.7.3 虚拟内存</h3><p>虚拟内存是一个抽象概念，它为每个进程提供一个假象，即每个进程都在独占使用主存。每个进程看到的内存都是一致的，称为虚拟地址空间。</p>
+<ul>
+<li>程序代码和数据。对所有的进程来说，代码是从同一固定地址开始，紧接着的是和C全局变量相对应的数据位置。</li>
+<li>堆。代码和数据区后紧随着的是运行时堆。堆可以在运行时动态的扩展和收缩。</li>
+<li>共享库。地址空间的中间部分有一个块存放像C标准库和数学库这样的共享库的代码和数据的区域。</li>
+<li>栈。每次调用函数时，栈就会增长，从一个函数返回时，栈就会收缩。</li>
+<li>内核虚拟内存。地址空间顶部的区域是为内核保留。<br>  <img src="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250724175948.png"></li>
+</ul>
+<h3 id="1-7-4-文件"><a href="#1-7-4-文件" class="headerlink" title="1.7.4 文件"></a>1.7.4 文件</h3><p>文件就是字节序列。每个<code>I/O设备，包括磁盘、键盘、显示器，甚至是网络，都可以看成是文件</code>。Linux系统上的所有东西都是文件，因此Linux可以称为文件操作系统。</p>
+<h2 id="1-8-系统之间利用网络通信"><a href="#1-8-系统之间利用网络通信" class="headerlink" title="1.8 系统之间利用网络通信"></a>1.8 系统之间利用网络通信</h2><p>跟上面的hello运行差不多，只是输入地方和输出地方不同</p>
+<p>![](C:/Users/lan/Documents/笔记/img/深入理解计算机系统（第三版）笔记/Pasted image 20250724181127.png)</p>
+<h2 id="1-9-重要主题"><a href="#1-9-重要主题" class="headerlink" title="1.9 重要主题"></a>1.9 重要主题</h2><p><strong>系统不仅仅只是硬件。系统是硬件和系统软件互相交织的集合体，它们必须共同协作以达到运行应用程序的最终目的。</strong></p>
+<h3 id="1-9-1-Amdahl定理"><a href="#1-9-1-Amdahl定理" class="headerlink" title="1.9.1 Amdahl定理"></a>1.9.1 Amdahl定理</h3><p>Amdahl定律的主要观点–想要显著加速整个系统,必须提升全系统中相当大部分的速度.<br><strong>练习题1:</strong></p>
+<blockquote>
+<p>行程中固定消耗10个小时也就是1000公里,因此2500-1000=1500公里,我们只能在这1500公里作文章.<br>25小时/1.67=15小时，15-10=5小时<br>现在通过蒙大拿州的时间只有5小时，1500/5=300，因此我们通过蒙大拿的时速为300公里</p>
+</blockquote>
+<p><strong>练习题2：</strong><br>Amdahl公式：<br>$$<br>S_\infty = \frac{1}{(1 - \alpha)+\alpha/k}<br>$$<br>已知：性能加速是2X，可以加速部份为80%，那么公式表达如下：<br>$$<br>2_\infty = \frac{1}{(1 - 0.8)+0.8/k}<br>$$</p>
+<ol>
+<li>两边取倒数（互换分子和分母）：1/2 = (1−0.8) + 0.8/k</li>
+<li>代入 (1−0.8)=0.2：<ul>
+<li>1/2 = 0.2 + 0.8/k</li>
+</ul>
+</li>
+<li>两边同时减去 0.2：<ul>
+<li>1/2 − 0.2 = 0.8/k</li>
+<li>0.5 − 0.2 = 0.8/k</li>
+<li>0.3 = 0.8/k</li>
+</ul>
+</li>
+<li>交叉相乘或两边取倒数解 k：<ul>
+<li>k = 0.8 / 0.3 ≈ 2.67</li>
+</ul>
+</li>
+</ol>
+<h3 id="1-9-2-并发和并行"><a href="#1-9-2-并发和并行" class="headerlink" title="1.9.2 并发和并行"></a>1.9.2 并发和并行</h3><ol>
+<li>线性级并发<ul>
+<li>传统意义上，并发执行只是模拟出来，是通过使用一台计算机在它正在执行的进程间快速切换来实现的。</li>
+</ul>
+</li>
+<li>指令级并行<ul>
+<li>在较低层次上，现代处理器可以同时执行多条指令的属性称为指令级并行。 </li>
+</ul>
+</li>
+<li>单指令、多数据并行<ul>
+<li>在最低层次上，许多现代处理器拥有特殊的硬件，允许一条指令产生多个可以并行执行的操作，这种方式称为单指令、多数据。即SIMD并行。</li>
+</ul>
+</li>
+</ol>
+<h3 id="1-9-3-计算机系统中抽象的重要性"><a href="#1-9-3-计算机系统中抽象的重要性" class="headerlink" title="1.9.3 计算机系统中抽象的重要性"></a>1.9.3 计算机系统中抽象的重要性</h3><p>抽象的使用是计算机科学中最为重要的概念之一。</p>
+<ul>
+<li>文件是对I/O设备的抽象</li>
+<li>虚拟内存是对程序存储器的抽象</li>
+<li>进程是对一个正在运行程序的抽象</li>
+<li>虚拟机是对整个计算机的抽象，包括操作系统、处理器和程序。<br>  <img src="https://v-1257959324.cos.ap-guangzhou.myqcloud.com/blog/Pasted%20image%2020250725180245.png"></li>
+</ul>
+<h2 id="1-10-小结"><a href="#1-10-小结" class="headerlink" title="1.10 小结"></a>1.10 小结</h2><ul>
+<li>计算机系统是由硬件和系统软件组成的，它们共同协作以运作应用程序。计算机内部的信息被表示为一组组的位，它们根据上下文有不同的解释方式。程序被其他程序翻译成不同的形式，开始时是ASCII文本，然后被编译器和链接器翻译成二进制可执行文件。</li>
+<li>处理器读取并解释存放在主存里的二进制文件。因为计算机花费大量的时间在内存、I/O设备和CPU寄存器之间复制数据，所以将系统中的存储设备划分层层级结构——CPU寄存器在顶级，接着是多层硬件高速缓存存储器、DRAM主存和磁盘存储器。在层级模型中，位于更高层的存储设备比低层的存储设备更快，单位比特造价也更高。层次结构中较高层次的存储设备可以作为较低层次设备的高速缓存。通过理解和运用这种存储层次结构的知识，程序员可以优化C程序的性能。</li>
+<li>操作系统内核是应用程序和硬件之间的媒介。它提供三个基本的抽象：<ol>
+<li>文件是I/O的抽象</li>
+<li>虚拟内存是对主存和磁盘的抽象</li>
+<li>进程是处理器、主存和I/O设备的抽象</li>
+</ol>
+</li>
+<li>网络也是一种I/O设备</li>
+</ul>
+<h2 id="2-1-信息存储"><a href="#2-1-信息存储" class="headerlink" title="2.1 信息存储"></a>2.1 信息存储</h2><p>大多数计算机使用8位的字节（byte），字节作为可通过虚拟内存地址找到的内存单位，而不是访问内存中单独的位。<br>机器级程序（对计算机发出指令的程序）将内存视为一个非常大的字节数组，称为虚拟内存（virtual memory）。虚拟内存中的每个字节都由一个唯一的数字标识，这个数字被称为地址（address），所有可能地址的集合就称为虚拟地址空间（virtual address space）。<br>虚拟地址空间是展现机器级程序的抽象概念，实际的实现是将动态随机访问存储器（DRAM）、闪存、磁盘存储器、特殊硬件和操作系统结合起来，给程序提供一个字节数组。<br>每个程序对象都可以简单地视为一个字节块，而程序本身就是一个字节序列。</p>
+<h3 id="2-1-1-十六进制表达法"><a href="#2-1-1-十六进制表达法" class="headerlink" title="2.1.1 十六进制表达法"></a>2.1.1 十六进制表达法</h3><p>一个字节有8位组成。<br>在C语言中，以0x或0X开头的数字常量被认为是十六进制的值。<br>十六进制转二进制时，如果总数不是4的倍数，在最左边的一组可以少于4位，前面用0补足。</p>
+<h2 id="练习题-2-1-完成下面的转换："><a href="#练习题-2-1-完成下面的转换：" class="headerlink" title="练习题 2.1 完成下面的转换："></a>练习题 2.1 完成下面的转换：</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">A. 将 Ox39A7F8 转换为二进制。</span><br><span class="line">B. 将二进制 1100100101111011 转换为十六进制。</span><br><span class="line">C. 将 OxD5E4C 转换为二进制。 </span><br><span class="line">D. 将二进制 1001101110011110110101 转换为十六进制。</span><br></pre></td></tr></table></figure>
+
+<p><strong>A.</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">分解</span><br><span class="line">39A7F8</span><br><span class="line">3=0011</span><br><span class="line">9=1001</span><br><span class="line">A=1010</span><br><span class="line">7=0111</span><br><span class="line">F=1111</span><br><span class="line">8=1000</span><br><span class="line"></span><br><span class="line">001110011010011111111000</span><br></pre></td></tr></table></figure>
+
+<p>B.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1100 1001 0111 1011</span><br><span class="line">C97B</span><br></pre></td></tr></table></figure>
+
+<p>C.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">分解</span><br><span class="line">DSE4C</span><br><span class="line">D=1101</span><br><span class="line">5=0101</span><br><span class="line">E=1110</span><br><span class="line">4=0100</span><br><span class="line">C=1100</span><br><span class="line">11010101111001001100</span><br></pre></td></tr></table></figure>
+
+<p>D.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">前面不足4位，补位加到4位</span><br><span class="line">0010 0110 1110 0111 1011 0101</span><br><span class="line">26E7B5</span><br></pre></td></tr></table></figure>
+
+<h2 id="练习题-2-2"><a href="#练习题-2-2" class="headerlink" title="练习题 2.2"></a>练习题 2.2</h2><table>
+<thead>
+<tr>
+<th><sup>N</sup></th>
+<th>2<sup>N</sup>(十进制) )</th>
+<th>2<sup>N</sup>(十六进制)</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>9</td>
+<td>512</td>
+<td>0x200</td>
+<td></td>
+</tr>
+<tr>
+<td>19</td>
+<td>524288</td>
+<td>0x80000</td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td>16384</td>
+<td>0x4000</td>
+<td></td>
+</tr>
+<tr>
+<td>16</td>
+<td>65536</td>
+<td>0x10000</td>
+<td></td>
+</tr>
+<tr>
+<td>17</td>
+<td>131072</td>
+<td>0x20000</td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td>32</td>
+<td>0x20</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>128</td>
+<td>0x80</td>
+<td></td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">解：</span><br><span class="line">N=19</span><br><span class="line">2x2x2x2...x2=524288</span><br><span class="line"></span><br><span class="line">1000 0000 0000 0000 0000</span><br><span class="line">8 0 0 0 0</span><br><span class="line">0x80000</span><br><span class="line"></span><br><span class="line">这样算出2^n(十进制)为524288</span><br><span class="line">2^n(十六进制)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">16 384推出十六进制和N次方</span><br><span class="line">log(16384)/0.3010≈14</span><br><span class="line">n=14</span><br><span class="line"></span><br><span class="line">0100 0000 0000 0000</span><br><span class="line">4 0 0 0</span><br><span class="line">0x4000</span><br><span class="line"></span><br><span class="line">Ox1OOOO 推出十进制和N次方</span><br><span class="line">0x10000=1x16^4+0x16^3+0x16^2+0x16^1+0x16^0</span><br><span class="line">=1x65536+0+0+0+0</span><br><span class="line">=65535</span><br><span class="line"></span><br><span class="line">log(65535)/0.3010≈16</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">n=17 推出十进制和16进制</span><br><span class="line">2^17=131072</span><br><span class="line">0010 0000 0000 0000 0000</span><br><span class="line">2 0 0 0 0 0</span><br><span class="line">0x200000</span><br><span class="line"></span><br><span class="line">32推出十六进制和N次方</span><br><span class="line">log(32)/0.3010≈5</span><br><span class="line">0010 0000</span><br><span class="line">2 0</span><br><span class="line">0x20</span><br><span class="line"></span><br><span class="line">Ox80 推出十进制和N次方</span><br><span class="line">n=8x16^1+0+16^0</span><br><span class="line">n=128</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="练习题-2-3"><a href="#练习题-2-3" class="headerlink" title="练习题 2.3"></a>练习题 2.3</h2><table>
+<thead>
+<tr>
+<th>十进制</th>
+<th>二进制</th>
+<th>十六进制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0000 0000</td>
+<td>0x00</td>
+</tr>
+<tr>
+<td>167</td>
+<td>1010 01111</td>
+<td>0xA7</td>
+</tr>
+<tr>
+<td>62</td>
+<td>0011 1110</td>
+<td>0X3E</td>
+</tr>
+<tr>
+<td>188</td>
+<td>1011 1100</td>
+<td>0XBC</td>
+</tr>
+<tr>
+<td>55</td>
+<td>0011 0111</td>
+<td>0x37</td>
+</tr>
+<tr>
+<td>136</td>
+<td>1000 1000</td>
+<td>0x88</td>
+</tr>
+<tr>
+<td>243</td>
+<td>1111 0011</td>
+<td>0xf3</td>
+</tr>
+<tr>
+<td>82</td>
+<td>0101 0010</td>
+<td>0x52</td>
+</tr>
+<tr>
+<td>172</td>
+<td>1010 1100</td>
+<td>0xAC</td>
+</tr>
+<tr>
+<td>231</td>
+<td>1110 0111</td>
+<td>0xE7</td>
+</tr>
+<tr>
+<td>解：</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>十进制转二进制、十六进制</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">167=10x16...7</span><br><span class="line">10 = 十六进制（A） 二进制 1010</span><br><span class="line">7 = 十六进制（7） 二进制 0111</span><br></pre></td></tr></table></figure>
+
+<p>二进制转十六进制、十进制</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">0011 0111</span><br><span class="line">0011 = 十进制3 十六进制 3</span><br><span class="line">0111 = 十进制7 十六进制 7 </span><br><span class="line"></span><br><span class="line">十六进制0X37</span><br><span class="line">十进制=3x16+7</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>十六进制转二进制、十进制</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Ox52</span><br><span class="line"></span><br><span class="line">5=二进制 0101 十进制 5</span><br><span class="line">2=二进制 0010 十进制 2</span><br><span class="line">0101 0010</span><br><span class="line">5x16+2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="练习题-2-4"><a href="#练习题-2-4" class="headerlink" title="练习题 2.4"></a>练习题 2.4</h2><p>A.0x503c+0x8=0x5044<br>B.0x503c-0x40=0x4ffc<br>C. 0x503c+64=0x507c<br>D.0x50ea-0x503c=0xAE<br>使用小学教的加减法，不过进位数是16即可。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首页</a></li>
+         
+          <li><a href="/about/">关于</a></li>
+         
+          <li><a href="/archives/">归档</a></li>
+         
+          <li><a href="/projects_url">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC1%E7%AB%A0-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8"><span class="toc-number">1.</span> <span class="toc-text">第1章 计算机系统漫游</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 程序编译流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E5%8F%AF%E9%87%8D%E5%AE%9A%E4%BD%8D%E7%9B%AE%E6%A0%87%E7%A8%8B%E5%BA%8F%EF%BC%88relocatable-object-program%EF%BC%89%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 可重定位目标程序（relocatable object program）格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E5%A4%84%E7%90%86%E5%99%A8%E8%AF%BB%E5%B9%B6%E8%A7%A3%E9%87%8A%E5%82%A8%E5%AD%98%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="toc-number">1.3.</span> <span class="toc-text">1.4 处理器读并解释储存在内存中的指令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-1-%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%A1%AC%E4%BB%B6%E7%BB%84%E6%88%90"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.4.1 系统的硬件组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-1-%E6%80%BB%E7%BA%BF"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">1.4.1.1 总线</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-2-I-O%E8%AE%BE%E5%A4%87"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">1.4.1.2 I&#x2F;O设备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-3-%E4%B8%BB%E5%AD%98%EF%BC%88%E5%86%85%E5%AD%98%E6%9D%A1%EF%BC%89"><span class="toc-number">1.3.1.3.</span> <span class="toc-text">1.4.1.3 主存（内存条）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1-4-%E5%A4%84%E7%90%86%E5%99%A8%EF%BC%88CPU%EF%BC%89"><span class="toc-number">1.3.1.4.</span> <span class="toc-text">1.4.1.4 处理器（CPU）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-2-%E8%BF%90%E8%A1%8Chello%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.3.2.</span> <span class="toc-text">1.4.2 运行hello程序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%8F%AA%E5%85%B3%E9%87%8D%E8%A6%81"><span class="toc-number">1.4.</span> <span class="toc-text">1.5 高速缓存只关重要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6-%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%E5%BD%A2%E6%88%90%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="toc-number">1.5.</span> <span class="toc-text">1.6 存储设备形成层次结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-7-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86%E7%A1%AC%E4%BB%B6"><span class="toc-number">1.6.</span> <span class="toc-text">1.7 操作系统管理硬件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-1-%E8%BF%9B%E7%A8%8B"><span class="toc-number">1.6.1.</span> <span class="toc-text">1.7.1 进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-2-%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.6.2.</span> <span class="toc-text">1.7.2 线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-3-%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="toc-number">1.6.3.</span> <span class="toc-text">1.7.3 虚拟内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-4-%E6%96%87%E4%BB%B6"><span class="toc-number">1.6.4.</span> <span class="toc-text">1.7.4 文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-8-%E7%B3%BB%E7%BB%9F%E4%B9%8B%E9%97%B4%E5%88%A9%E7%94%A8%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1"><span class="toc-number">1.7.</span> <span class="toc-text">1.8 系统之间利用网络通信</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-9-%E9%87%8D%E8%A6%81%E4%B8%BB%E9%A2%98"><span class="toc-number">1.8.</span> <span class="toc-text">1.9 重要主题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-1-Amdahl%E5%AE%9A%E7%90%86"><span class="toc-number">1.8.1.</span> <span class="toc-text">1.9.1 Amdahl定理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-2-%E5%B9%B6%E5%8F%91%E5%92%8C%E5%B9%B6%E8%A1%8C"><span class="toc-number">1.8.2.</span> <span class="toc-text">1.9.2 并发和并行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-9-3-%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E4%B8%AD%E6%8A%BD%E8%B1%A1%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="toc-number">1.8.3.</span> <span class="toc-text">1.9.3 计算机系统中抽象的重要性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-10-%E5%B0%8F%E7%BB%93"><span class="toc-number">1.9.</span> <span class="toc-text">1.10 小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E4%BF%A1%E6%81%AF%E5%AD%98%E5%82%A8"><span class="toc-number">1.10.</span> <span class="toc-text">2.1 信息存储</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%A1%A8%E8%BE%BE%E6%B3%95"><span class="toc-number">1.10.1.</span> <span class="toc-text">2.1.1 十六进制表达法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-1-%E5%AE%8C%E6%88%90%E4%B8%8B%E9%9D%A2%E7%9A%84%E8%BD%AC%E6%8D%A2%EF%BC%9A"><span class="toc-number">1.11.</span> <span class="toc-text">练习题 2.1 完成下面的转换：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-2"><span class="toc-number">1.12.</span> <span class="toc-text">练习题 2.2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-3"><span class="toc-number">1.13.</span> <span class="toc-text">练习题 2.3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98-2-4"><span class="toc-number">1.14.</span> <span class="toc-text">练习题 2.4</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&text=深入理解计算机系统（第三版）笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&is_video=false&description=深入理解计算机系统（第三版）笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=深入理解计算机系统（第三版）笔记&body=Check out this article: http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&title=深入理解计算机系统（第三版）笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&name=深入理解计算机系统（第三版）笔记&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2025/08/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%EF%BC%88%E7%AC%AC%E4%B8%89%E7%89%88%EF%BC%89%E7%AC%94%E8%AE%B0/&t=深入理解计算机系统（第三版）笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2025
+    John Doe
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a href="/projects_url">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
